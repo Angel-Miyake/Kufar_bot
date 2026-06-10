@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kufar Bot Panel</title>
+</head>
+<body>
+
+<h2>Добавить фильтр</h2>
+
+<form method="post" action="/add">
+    Telegram ID: <input type="number" name="telegram_id" required><br><br>
+    Kufar URL: <input type="text" name="url" size="60" required><br><br>
+    <button type="submit">Добавить</button>
+</form>
+
+<hr>
+
+<h2>Сохранённые фильтры</h2>
+
+<table border="1" cellpadding="10">
+<tr>
+    <th>ID</th>
+    <th>Telegram ID</th>
+    <th>URL</th>
+</tr>
+
+{% for f in filters %}
+<tr>
+    <td>{{ f[0] }}</td>
+    <td>{{ f[1] }}</td>
+    <td>{{ f[2] }}</td>
+</tr>
+{% endfor %}
+
+</table>
+
+</body>
+</html>
