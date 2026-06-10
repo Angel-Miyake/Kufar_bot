@@ -1,6 +1,2 @@
 Flask==3.0.3
 aiosqlite==0.20.0
-python-telegram-bot[job-queue]
-playwright
-aiohttp==3.9.5
-greenlet==3.0.3
