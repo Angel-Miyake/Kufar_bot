@@ -3,7 +3,7 @@
 <head>
 <title>Kufar HUD</title>
 
-<!-- 📱 MOBILE FIX (6.1–6.7") + ZOOM LOCK -->
+<!-- 📱 MOBILE FIX + ZOOM BLOCK -->
 <meta name="viewport"
       content="width=device-width,
                initial-scale=1,
@@ -13,7 +13,7 @@
 
 <style>
 
-/* ====== BASE THEME ====== */
+/* ===== THEME ===== */
 body.dark {
     --bg:#0b1220;
     --card:rgba(255,255,255,0.06);
@@ -26,26 +26,41 @@ body {
     font-family:Arial;
     background:var(--bg);
     color:var(--text);
-
-    /* 🚫 BLOCK ZOOM GESTURES */
     touch-action: manipulation;
 }
 
-/* ====== LAYOUT ====== */
+/* ===== LAYOUT ===== */
 .wrapper {
     display:flex;
     min-height:100vh;
 }
 
-/* ====== SIDEBAR (оставляем как резерв) ====== */
+/* ===== SIDEBAR ===== */
 .sidebar {
     width:240px;
     padding:20px;
     background:rgba(0,0,0,0.25);
 }
 
-/* ====== TOP MOBILE TABS (НОВЫЙ UI СЛОЙ) ====== */
-.mobile-tabs {
+.sidebar button {
+    width:100%;
+    margin:6px 0;
+    padding:10px;
+    border:none;
+    border-radius:8px;
+    background:var(--card);
+    color:var(--text);
+    cursor:pointer;
+}
+
+/* ===== MAIN ===== */
+.main {
+    flex:1;
+    padding:30px;
+}
+
+/* ===== MOBILE TABS ===== */
+.tabs {
     display:none;
     position:sticky;
     top:0;
@@ -53,12 +68,11 @@ body {
     background:rgba(0,0,0,0.4);
     backdrop-filter: blur(10px);
     padding:10px;
-    justify-content:space-between;
+    gap:6px;
 }
 
-.mobile-tabs button {
+.tabs button {
     flex:1;
-    margin:0 4px;
     padding:10px;
     border:none;
     border-radius:10px;
@@ -66,13 +80,7 @@ body {
     color:var(--text);
 }
 
-/* ====== MAIN ====== */
-.main {
-    flex:1;
-    padding:30px;
-}
-
-/* ====== CARD ====== */
+/* ===== CARDS ===== */
 .card {
     background:var(--card);
     padding:20px;
@@ -80,8 +88,8 @@ body {
     margin-bottom:15px;
 }
 
-/* ====== INPUT ====== */
-input {
+/* ===== INPUT ===== */
+input, select {
     width:100%;
     padding:10px;
     margin:6px 0;
@@ -94,9 +102,10 @@ input {
 input[type=submit] {
     background:#3b82f6;
     color:white;
+    cursor:pointer;
 }
 
-/* ====== STATS ====== */
+/* ===== STATS ===== */
 .stat-box { display:flex; gap:10px; }
 
 .stat {
@@ -107,7 +116,7 @@ input[type=submit] {
     text-align:center;
 }
 
-/* ====== MARKET ====== */
+/* ===== MARKET ===== */
 .market {
     margin-top:20px;
     background:var(--card);
@@ -115,7 +124,7 @@ input[type=submit] {
     border-radius:14px;
 }
 
-/* ====== BUTTONS ====== */
+/* ===== BUTTONS ===== */
 .btn {
     display:inline-block;
     margin-top:8px;
@@ -127,33 +136,20 @@ input[type=submit] {
     font-size:12px;
 }
 
-.copy {
-    background:#10b981;
-    margin-left:6px;
-}
+.copy { background:#10b981; }
 
-.url {
-    word-break: break-all;
-}
+.url { word-break: break-all; }
 
-/* ====== RESPONSIVE (6.1–6.7") ====== */
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
 
-    .wrapper {
-        flex-direction:column;
-    }
+    .wrapper { flex-direction:column; }
 
-    .sidebar {
-        display:none;
-    }
+    .sidebar { display:none; }
 
-    .main {
-        padding:12px;
-    }
+    .tabs { display:flex; }
 
-    .mobile-tabs {
-        display:flex;
-    }
+    .main { padding:12px; }
 }
 
 </style>
@@ -162,7 +158,7 @@ input[type=submit] {
 <body class="dark">
 
 <!-- 📱 MOBILE TABS -->
-<div class="mobile-tabs">
+<div class="tabs">
     <button onclick="show('dash')">Dashboard</button>
     <button onclick="show('filters')">Filters</button>
     <button onclick="show('add')">Add</button>
@@ -171,7 +167,7 @@ input[type=submit] {
 
 <div class="wrapper">
 
-<!-- SIDEBAR (desktop) -->
+<!-- SIDEBAR -->
 <div class="sidebar">
 <h3>📦 HUD</h3>
 <button onclick="show('dash')">Dashboard</button>
@@ -202,7 +198,6 @@ input[type=submit] {
 </div>
 
 <div class="market">
-
 <h3>💰 Market Analytics</h3>
 
 <p>Total: <span id="m_total">{{ market.total }}</span></p>
@@ -224,13 +219,11 @@ input[type=submit] {
 <div class="card">
 
 <b>ID: {{ f[0] }}</b><br>
-Telegram: {{ f[1] }}<br>
-
-URL:
-<div class="url">{{ f[2] }}</div>
+Source: {{ f[3] }}<br>
+URL: <div class="url">{{ f[2] }}</div>
 
 <a class="btn" href="/delete/{{ f[0] }}">Delete</a>
-<button class="btn copy" onclick="copyText(this)">Copy URL</button>
+<button class="btn copy" onclick="copyText(this)">Copy</button>
 
 </div>
 
@@ -238,26 +231,30 @@ URL:
 
 </div>
 
-<!-- ADD FILTER (НОВАЯ ВКЛАДКА) -->
+<!-- ADD FILTER -->
 <div id="add" style="display:none">
 
 <h1>➕ Add Filter</h1>
 
 <form method="post" action="/add">
 
-Telegram ID
-<input name="telegram_id" type="number" required>
+<!-- 🔥 SOURCE SELECT -->
+Source
+<select name="source" required>
+    <option value="kufar">Kufar</option>
+    <option value="avby">Av.by</option>
+</select>
 
 URL
 <input name="url" type="text" required>
 
-<input type="submit" value="Add">
+<input type="submit" value="Add Filter">
 
 </form>
 
 </div>
 
-<!-- ANALYTICS (ОТДЕЛЬНАЯ ВКЛАДКА) -->
+<!-- ANALYTICS -->
 <div id="analytics" style="display:none">
 
 <h1>📈 Analytics</h1>
@@ -278,23 +275,19 @@ URL
 
 <script>
 
-// ---------------- NAV ----------------
-
+// ===== NAV =====
 function show(id){
-
     document.querySelectorAll(".main > div").forEach(d => d.style.display = "none");
     document.getElementById(id).style.display = "block";
 }
 
-// ---------------- COPY ----------------
-
+// ===== COPY =====
 function copyText(btn){
     let url = btn.parentElement.querySelector(".url").innerText;
     navigator.clipboard.writeText(url);
 }
 
-// ---------------- REALTIME ----------------
-
+// ===== REALTIME =====
 async function update(){
 
     try {
