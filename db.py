@@ -409,7 +409,7 @@ async def get_stats():
             "total_sent": total_sent,
             "total_ads": total_ads
         }
-    async def get_filters_for_panel():
+async def get_filters_for_panel():
 
         async with aiosqlite.connect(DB_NAME) as db:
 

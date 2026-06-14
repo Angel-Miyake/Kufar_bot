@@ -159,10 +159,10 @@ input[type=submit] {
 
 <!-- 📱 MOBILE TABS -->
 <div class="tabs">
-    <button onclick="show('dash')">Dashboard</button>
-    <button onclick="show('filters')">Filters</button>
-    <button onclick="show('add')">Add</button>
-    <button onclick="show('analytics')">Stats</button>
+    <button onclick="show('dash')">Главная</button>
+    <button onclick="show('filters')">Фильтры</button>
+    <button onclick="show('add')">Добавить</button>
+    <button onclick="show('analytics')">Аналитика</button>
 </div>
 
 <div class="wrapper">
@@ -170,10 +170,10 @@ input[type=submit] {
 <!-- SIDEBAR -->
 <div class="sidebar">
 <h3>📦 HUD</h3>
-<button onclick="show('dash')">Dashboard</button>
-<button onclick="show('filters')">Filters</button>
-<button onclick="show('add')">Add Filter</button>
-<button onclick="show('analytics')">Analytics</button>
+<button onclick="show('dash')">Главная</button>
+<button onclick="show('filters')">Фильтры</button>
+<button onclick="show('add')">Добавить</button>
+<button onclick="show('analytics')">Аналитика</button>
 </div>
 
 <div class="main">
@@ -181,7 +181,7 @@ input[type=submit] {
 <!-- DASHBOARD -->
 <div id="dash">
 
-<h1>📊 Dashboard</h1>
+<h1>📊 Главная</h1>
 
 <div class="stat-box">
 
@@ -198,7 +198,7 @@ input[type=submit] {
 </div>
 
 <div class="market">
-<h3>💰 Market Analytics</h3>
+<h3>💰 Рыночная Аналитика</h3>
 
 <p>Total: <span id="m_total">{{ market.total }}</span></p>
 <p>Avg: <span id="m_avg">{{ market.avg_price }}</span></p>
@@ -212,18 +212,35 @@ input[type=submit] {
 <!-- FILTERS -->
 <div id="filters" style="display:none">
 
-<h1>📋 Filters</h1>
+<h1>📋 Фильтры</h1>
 
 {% for f in filters %}
 
 <div class="card">
 
-<b>ID: {{ f[0] }}</b><br>
-Source: {{ f[3] }}<br>
-URL: <div class="url">{{ f[2] }}</div>
+<h3>
+{% if f[2] == "avby" %}
+🚗 AV.BY
+{% else %}
+🛒 Kufar
+{% endif %}
+</h3>
 
-<a class="btn" href="/delete/{{ f[0] }}">Delete</a>
-<button class="btn copy" onclick="copyText(this)">Copy</button>
+<p>Фильтр #{{ f[0] }}</p>
+
+<div class="url" data-url="{{ f[3] }}">
+{{ f[3][:60] }}...
+</div>
+
+<br>
+
+<a class="btn" href="/delete/{{ f[0] }}">
+🗑 Удалить
+</a>
+
+<button class="btn copy" onclick="copyText(this)">
+📋 Копировать ссылку
+</button>
 
 </div>
 
@@ -234,7 +251,7 @@ URL: <div class="url">{{ f[2] }}</div>
 <!-- ADD FILTER -->
 <div id="add" style="display:none">
 
-<h1>➕ Add Filter</h1>
+<h1>➕ Добавить фильтры</h1>
 
 <form method="post" action="/add">
 
@@ -283,8 +300,19 @@ function show(id){
 
 // ===== COPY =====
 function copyText(btn){
-    let url = btn.parentElement.querySelector(".url").innerText;
+
+    let url =
+        btn.parentElement
+        .querySelector(".url")
+        .dataset.url;
+
     navigator.clipboard.writeText(url);
+
+    btn.innerText = "✅ Скопировано";
+
+    setTimeout(() => {
+        btn.innerText = "📋 Копировать ссылку";
+    }, 1500);
 }
 
 // ===== REALTIME =====

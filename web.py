@@ -11,7 +11,7 @@ import asyncio
 from db import (
     init_db,
     add_filter_v2,
-    get_all_filters,
+    get_filters_for_panel,
     get_stats,
     delete_filter,
     get_market_stats
@@ -49,7 +49,7 @@ def index():
         return redirect("/")
 
     filters = asyncio.run(
-        get_all_filters()
+        get_filters_for_panel()
     )
 
     stats = asyncio.run(
