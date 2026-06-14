@@ -424,5 +424,5 @@ async def get_filters_for_panel():
                 FROM filters
                 ORDER BY id DESC
             """)
-
         return await cur.fetchall()
+        return rows
