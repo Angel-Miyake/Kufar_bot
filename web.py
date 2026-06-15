@@ -7,15 +7,14 @@ from flask import (
 )
 
 import asyncio
-
-parser_running = False
-
 from db import (
     init_db,
     add_filter_v2,
     get_filters_for_panel,
     get_stats,
     delete_filter,
+    set_setting,
+     get_setting,
     get_market_stats
 )
 
@@ -101,22 +100,19 @@ def api_market():
 
 @app.route("/api/run", methods=["POST"])
 def run():
-    global parser_running
-    parser_running = True
+    asyncio.run(set_setting("parser_running", "1"))
     return jsonify({"status": "running"})
-
 
 @app.route("/api/stop", methods=["POST"])
 def stop():
-    global parser_running
-    parser_running = False
+    asyncio.run(set_setting("parser_running", "0"))
     return jsonify({"status": "stopped"})
-
 
 @app.route("/api/status")
 def status():
+    state = asyncio.run(get_setting("parser_running", "1"))
     return jsonify({
-        "running": parser_running
+        "running": state == "1"
     })
 
 
@@ -124,7 +120,7 @@ def status():
 
 if __name__ == "__main__":
     asyncio.run(init_db())
-
+    asyncio.run(set_setting("parser_running", "1"))
     import os
 
     port = int(os.environ.get("PORT", 5000))

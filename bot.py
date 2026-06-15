@@ -1,7 +1,4 @@
 import asyncio
-
-parser_running = False
-
 from parser_avby import fetch_ads_avby
 from telegram import Update
 from telegram.ext import (
@@ -22,6 +19,7 @@ from db import (
     save_market_ad,
     delete_filter,
     get_stats,
+    get_setting,
     mark_initialized
 )
 
@@ -156,32 +154,17 @@ async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"📦 Объявлений в базе: {s['total_ads']}"
     )
 
-# ---------------- CONTROL BOT ----------------
-
-async def run_parser(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    global parser_running
-
-    parser_running = True
-
-    await update.message.reply_text("🟢 Парсер запущен")
-
-
-async def stop_parser(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    global parser_running
-
-    parser_running = False
-
-    await update.message.reply_text("🔴 Парсер остановлен")
 
 # ---------------- CHECK ADS ----------------
 
 async def check_ads(context: ContextTypes.DEFAULT_TYPE):
-    
-    global parser_running
-    from web import parser_running
-    if not parser_running:
-        print("⛔️ PARSER OFF (manual stop)")
+
+    running = await get_setting("parser_running", "1")
+
+    if running != "1":
+        print("⛔ PARSER STOPPED FROM MINI APP")
         return
+    
 
     if check_lock.locked():
 
@@ -332,22 +315,6 @@ async def check_ads(context: ContextTypes.DEFAULT_TYPE):
         )
         print("==============================\n")
 
-def start_parser_job(app):
-    job = app.job_queue.run_repeating(
-        check_ads,
-        interval=CHECK_INTERVAL,
-        first=1,
-        name="parser_job"
-    )
-    app.bot_data["parser_job"] = job
-
-
-def stop_parser_job(app):
-    job = app.bot_data.get("parser_job")
-
-    if job:
-        job.schedule_removal()
-        app.bot_data["parser_job"] = None
 
 # ---------------- STARTUP ----------------
 
@@ -386,14 +353,6 @@ def main():
 
     app.add_handler(
         CommandHandler("stats", stats)
-    )
-
-    app.add_handler(
-        CommandHandler("run", run_parser)
-    )
-
-    app.add_handler(
-        CommandHandler("stop", stop_parser)
     )
 
     app.job_queue.run_repeating(

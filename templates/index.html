@@ -410,9 +410,10 @@ input[type=submit] {
 <div class="card">
     <h3>Парсер</h3>
 
-    <button class="btn" onclick="runParser()">
-        ▶ Запустить парсер
-    </button>
+    <div id="status">🔴 неизвестно</div>
+
+    <button class="btn copy" onclick="runParser()">▶ START</button>
+    <button class="btn" onclick="stopParser()">⛔ STOP</button>
 </div>
 </div>
 
@@ -565,19 +566,25 @@ async function update(){
 }
 
 async function runParser(){
-
-    await fetch("/api/run-parser", {
-        method: "POST"
-    });
-
-    alert("Парсер запущен");
+    await fetch("/api/run", {method:"POST"});
+    updateStatus();
 }
 
-document
-    .querySelector(".tabs button")
-    ?.classList.add("active");
+async function stopParser(){
+    await fetch("/api/stop", {method:"POST"});
+    updateStatus();
+}
 
-setInterval(update, 2000);
+async function updateStatus(){
+    let r = await fetch("/api/status");
+    let s = await r.json();
+
+    document.getElementById("status").innerText =
+        s.running ? "🟢 работает" : "🔴 остановлен";
+}
+
+updateStatus();
+setInterval(updateStatus, 3000);
 
 </script>
 
