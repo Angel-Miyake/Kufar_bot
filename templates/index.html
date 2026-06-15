@@ -62,10 +62,19 @@ h3{
 }
 
 .status{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+
     padding:10px 16px;
+
     border-radius:14px;
+
     font-size:14px;
     font-weight:600;
+
+    white-space:nowrap;
 }
 
 .online{
@@ -78,6 +87,13 @@ h3{
     background:rgba(255,69,58,.15);
     color:#FF453A;
     border:1px solid rgba(255,69,58,.25);
+}
+
+.dot{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:#34C759;
 }
 
 /* ===== LAYOUT ===== */
@@ -148,6 +164,11 @@ h3{
 
     font-size:12px;
     font-weight:600;
+}
+
+.tabs button.active{
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.08);
 }
 
 /* ===== CARDS ===== */
@@ -310,10 +331,10 @@ input[type=submit] {
 <!-- SIDEBAR -->
 <div class="sidebar">
 <h3>📦 MENU</h3>
-<button onclick="show('dash')">Главная</button>
-<button onclick="show('filters')">Фильтры</button>
-<button onclick="show('add')">Добавить</button>
-<button onclick="show('analytics')">Аналитика</button>
+<button onclick="show('dash', this)">Главная</button>
+<button onclick="show('filters', this)">Фильтры</button>
+<button onclick="show('add', this)">Добавить</button>
+<button onclick="show('analytics', this)">Аналитика</button>
 </div>
 
 <div class="main">
@@ -330,7 +351,8 @@ input[type=submit] {
     </div>
 
     <div class="status online">
-        🟢 Online
+        <span class="dot"></span>
+        Online
     </div>
     
 </div>
@@ -474,9 +496,23 @@ URL
 <script>
 
 // ===== NAV =====
-function show(id){
-    document.querySelectorAll(".main > div").forEach(d => d.style.display = "none");
-    document.getElementById(id).style.display = "block";
+function show(id, btn){
+
+    document
+        .querySelectorAll(".main > div")
+        .forEach(d => d.style.display = "none");
+
+    document
+        .getElementById(id)
+        .style.display = "block";
+
+    document
+        .querySelectorAll(".tabs button")
+        .forEach(b => b.classList.remove("active"));
+
+    if(btn){
+        btn.classList.add("active");
+    }
 }
 
 // ===== COPY =====
@@ -520,6 +556,10 @@ async function update(){
         console.log(e);
     }
 }
+
+document
+    .querySelector(".tabs button")
+    ?.classList.add("active");
 
 setInterval(update, 2000);
 
