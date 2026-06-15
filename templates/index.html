@@ -188,6 +188,11 @@ input[type=submit] {
     margin-top:8px;
 }
 
+.stat div{
+    font-size:28px;
+    margin-bottom:12px;
+}
+
 /* ===== MARKET ===== */
 .market {
     margin-top:20px;
@@ -196,6 +201,26 @@ input[type=submit] {
     border-radius:24px;
     padding:24px;
     backdrop-filter:blur(20px);
+}
+
+.market-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    margin-top:16px;
+}
+
+.market-item{
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.05);
+    border-radius:16px;
+    padding:14px;
+}
+
+.market-item b{
+    display:block;
+    font-size:18px;
+    margin-top:4px;
 }
 
 /* ===== BUTTONS ===== */
@@ -290,13 +315,15 @@ input[type=submit] {
 <div class="stat-box">
 
 <div class="stat">
+<div>📂</div>
 <h2 id="filtersCount">{{ stats.total_filters }}</h2>
-<p>Filters</p>
+<p>Фильтров</p>
 </div>
 
 <div class="stat">
+<div>📨</div>
 <h2 id="sentCount">{{ stats.total_sent }}</h2>
-<p>Sent Ads</p>
+<p>Отправлено</p>
 </div>
 
 </div>
