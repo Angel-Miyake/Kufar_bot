@@ -340,7 +340,7 @@ input[type=submit] {
 <div class="main">
 
 <!-- DASHBOARD -->
-<!-- DASHBOARD -->
+
 <div id="dash">
 
 <div class="hero">
@@ -406,6 +406,13 @@ input[type=submit] {
 
 </div>
 
+</div>
+<div class="card">
+    <h3>Парсер</h3>
+
+    <button class="btn" onclick="runParser()">
+        ▶ Запустить парсер
+    </button>
 </div>
 </div>
 
@@ -555,6 +562,15 @@ async function update(){
     } catch(e){
         console.log(e);
     }
+}
+
+async function runParser(){
+
+    await fetch("/api/run-parser", {
+        method: "POST"
+    });
+
+    alert("Парсер запущен");
 }
 
 document

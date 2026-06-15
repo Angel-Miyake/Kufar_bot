@@ -8,6 +8,8 @@ from flask import (
 
 import asyncio
 
+parser_running = False
+
 from db import (
     init_db,
     add_filter_v2,
@@ -96,6 +98,26 @@ def api_market():
     return jsonify(
         asyncio.run(get_market_stats())
     )
+
+@app.route("/api/run", methods=["POST"])
+def run():
+    global parser_running
+    parser_running = True
+    return jsonify({"status": "running"})
+
+
+@app.route("/api/stop", methods=["POST"])
+def stop():
+    global parser_running
+    parser_running = False
+    return jsonify({"status": "stopped"})
+
+
+@app.route("/api/status")
+def status():
+    return jsonify({
+        "running": parser_running
+    })
 
 
 # ---------------- START ----------------
