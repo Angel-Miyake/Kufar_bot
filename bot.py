@@ -167,26 +167,116 @@ async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ---------------- CHECK ADS ----------------
 
-async def check_ads(context):
-    try:
-        log("🔥 ENTER check_ads")
+async def check_ads(context: ContextTypes.DEFAULT_TYPE):
 
-        running = await get_setting("parser_running", "1")
+    print("🔥 CHECK_ADS CALLED")
+    log("🔥 ENTER check_ads")
 
-        if running != "1":
-            log("⛔ PARSER STOPPED")
-            return
+    running = await get_setting("parser_running", "1")
 
-        if check_lock.locked():
-            log("⛔ SKIP (already running)")
-            return
-
-        async with check_lock:
-            log("🚀 START CHECK CYCLE")
-
-    except Exception as e:
-        log(f"❌ CRASH BEFORE LOOP: {e}")
+    if running != "1":
+        log("⛔ PARSER STOPPED FROM MINI APP")
         return
+
+    if check_lock.locked():
+        log("⛔ SKIP (already running)")
+        return
+
+    async with check_lock:
+
+        log("🚀 START CHECK CYCLE")
+
+        filters = await get_all_filters()
+
+        log(f"📦 TOTAL FILTERS: {len(filters)}")
+
+        total_sent = 0
+
+        for (
+            filter_id,
+            telegram_id,
+            source,
+            url,
+            initialized
+        ) in filters:
+
+            log("------------------------------")
+            log(f"📍 FILTER #{filter_id}")
+            log(f"📡 SOURCE: {source}")
+            log(f"🔗 URL: {url}")
+
+            try:
+
+                if source == "kufar":
+                    ads = await fetch_ads_playwright(url)
+
+                elif source == "avby":
+                    ads = await fetch_ads_avby(url)
+
+                else:
+                    ads = []
+
+                log(f"📄 FOUND ADS: {len(ads)}")
+
+                if not initialized:
+
+                    log(f"🆕 FIRST START FILTER #{filter_id}")
+
+                    for ad in ads:
+                        item_id = ad.get("id")
+
+                        if item_id:
+                            await save_sent_ad(filter_id, str(item_id))
+
+                    await mark_initialized(filter_id)
+                    continue
+
+                sent_count = 0
+                MAX_SEND_PER_CYCLE = 10
+
+                for ad in ads:
+
+                    if sent_count >= MAX_SEND_PER_CYCLE:
+                        log("🛑 LIMIT REACHED")
+                        break
+
+                    item_id = ad.get("id")
+
+                    if not item_id:
+                        continue
+
+                    item_id = str(item_id).strip()
+
+                    if await ad_already_sent(filter_id, item_id):
+                        continue
+
+                    await context.bot.send_message(
+                        chat_id=telegram_id,
+                        text=f"{ad['text']}\n\n{ad['link']}"
+                    )
+
+                    await save_sent_ad(filter_id, item_id)
+
+                    await save_market_ad(
+                        filter_id,
+                        item_id,
+                        ad["text"],
+                        ad.get("price"),
+                        ad["link"]
+                    )
+
+                    sent_count += 1
+                    total_sent += 1
+
+                log(f"📤 SENT FOR FILTER: {sent_count}")
+
+            except Exception as e:
+                log(f"❌ ERROR FILTER {filter_id}: {e}")
+
+        log("==============================")
+        log(f"🏁 CYCLE DONE | TOTAL SENT: {total_sent}")
+        log("==============================")
+
 
 
 # ---------------- STARTUP ----------------
