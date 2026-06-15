@@ -405,7 +405,16 @@ input[type=submit] {
     </div>
 
 </div>
-
+<div class="card">
+    <h3>📡 Лог парсера</h3>
+    <pre id="logBox" style="
+        max-height:300px;
+        overflow:auto;
+        white-space:pre-wrap;
+        font-size:12px;
+        opacity:0.9;
+    "></pre>
+</div>
 </div>
 <div class="card">
     <h3>Парсер</h3>
@@ -415,6 +424,7 @@ input[type=submit] {
     <button class="btn copy" onclick="runParser()">▶ START</button>
     <button class="btn" onclick="stopParser()">⛔ STOP</button>
 </div>
+
 </div>
 
 <!-- FILTERS -->
@@ -586,6 +596,23 @@ async function updateStatus(){
 updateStatus();
 setInterval(updateStatus, 3000);
 
+async function loadLogs(){
+
+    try {
+
+        let r = await fetch("/api/logs");
+        let data = await r.json();
+
+        document.getElementById("logBox").innerText =
+            data.logs.join("\n");
+
+    } catch(e){
+        console.log(e);
+    }
+}
+
+loadLogs();
+setInterval(loadLogs, 2000);
 </script>
 
 </body>

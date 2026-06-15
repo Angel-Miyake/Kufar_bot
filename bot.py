@@ -1,4 +1,14 @@
 import asyncio
+LOG_BUFFER = []
+
+def log(msg: str):
+    print(msg)
+    LOG_BUFFER.append(msg)
+
+    # защита от бесконечного роста памяти
+    if len(LOG_BUFFER) > 500:
+        LOG_BUFFER.pop(0)
+        
 from parser_avby import fetch_ads_avby
 from telegram import Update
 from telegram.ext import (
@@ -162,24 +172,20 @@ async def check_ads(context: ContextTypes.DEFAULT_TYPE):
     running = await get_setting("parser_running", "1")
 
     if running != "1":
-        print("⛔ PARSER STOPPED FROM MINI APP")
+        log("⛔ PARSER STOPPED FROM MINI APP")
         return
-    
 
     if check_lock.locked():
-
-        print("⛔️ SKIP (already running)")
+        log("⛔ SKIP (already running)")
         return
 
     async with check_lock:
 
-        print("\n==============================")
-        print("🚀 START CHECK CYCLE")
-        print("==============================")
+        log("🚀 START CHECK CYCLE")
 
         filters = await get_all_filters()
 
-        print(f"📦 TOTAL FILTERS: {len(filters)}")
+        log(f"📦 TOTAL FILTERS: {len(filters)}")
 
         total_sent = 0
 
@@ -191,72 +197,50 @@ async def check_ads(context: ContextTypes.DEFAULT_TYPE):
             initialized
         ) in filters:
 
-            print("\n------------------------------")
-            print(f"📍 FILTER #{filter_id}")
-            print(f"📡 SOURCE: {source}")
-            print(f"🔗 URL: {url}")
+            log("------------------------------")
+            log(f"📍 FILTER #{filter_id}")
+            log(f"📡 SOURCE: {source}")
+            log(f"🔗 URL: {url}")
 
             try:
 
                 # ---------------- SOURCE ----------------
 
                 if source == "kufar":
-
-                    ads = await fetch_ads_playwright(
-                        url
-                    )
+                    ads = await fetch_ads_playwright(url)
 
                 elif source == "avby":
-
-                    ads = await fetch_ads_avby(
-                        url
-                    )
+                    ads = await fetch_ads_avby(url)
 
                 else:
-
                     ads = []
-                print(
-                    f"📄 FOUND ADS: {len(ads)}"
-                )
+
+                log(f"📄 FOUND ADS: {len(ads)}")
 
                 # ---------------- FIRST INIT ----------------
 
                 if not initialized:
 
-                    print(
-                        f"🆕 FIRST START FILTER #{filter_id}"
-                    )
+                    log(f"🆕 FIRST START FILTER #{filter_id}")
 
                     for ad in ads:
-
                         item_id = ad.get("id")
 
                         if item_id:
+                            await save_sent_ad(filter_id, str(item_id))
 
-                            await save_sent_ad(
-                                filter_id,
-                                str(item_id)
-                            )
-
-                    await mark_initialized(
-                        filter_id
-                    )
-
+                    await mark_initialized(filter_id)
                     continue
 
                 # ---------------- SEND ADS ----------------
 
                 sent_count = 0
-
                 MAX_SEND_PER_CYCLE = 10
 
                 for ad in ads:
 
                     if sent_count >= MAX_SEND_PER_CYCLE:
-
-                        print(
-                            "🛑 LIMIT REACHED"
-                        )
+                        log("🛑 LIMIT REACHED")
                         break
 
                     item_id = ad.get("id")
@@ -264,27 +248,17 @@ async def check_ads(context: ContextTypes.DEFAULT_TYPE):
                     if not item_id:
                         continue
 
-                    item_id = str(
-                        item_id
-                    ).strip()
+                    item_id = str(item_id).strip()
 
-                    if await ad_already_sent(
-                        filter_id,
-                        item_id
-                    ):
+                    if await ad_already_sent(filter_id, item_id):
                         continue
 
                     await context.bot.send_message(
                         chat_id=telegram_id,
-                        text=
-                        f"{ad['text']}\n\n"
-                        f"{ad['link']}"
+                        text=f"{ad['text']}\n\n{ad['link']}"
                     )
 
-                    await save_sent_ad(
-                        filter_id,
-                        item_id
-                    )
+                    await save_sent_ad(filter_id, item_id)
 
                     await save_market_ad(
                         filter_id,
@@ -297,23 +271,14 @@ async def check_ads(context: ContextTypes.DEFAULT_TYPE):
                     sent_count += 1
                     total_sent += 1
 
-                print(
-                    f"📤 SENT FOR FILTER: {sent_count}"
-                )
+                log(f"📤 SENT FOR FILTER: {sent_count}")
 
             except Exception as e:
+                log(f"❌ ERROR FILTER {filter_id}: {e}")
 
-                print(
-                    f"❌ ERROR FILTER "
-                    f"{filter_id}: {e}"
-                )
-
-        print("\n==============================")
-        print(
-            f"🏁 CYCLE DONE | "
-            f"TOTAL SENT: {total_sent}"
-        )
-        print("==============================\n")
+        log("==============================")
+        log(f"🏁 CYCLE DONE | TOTAL SENT: {total_sent}")
+        log("==============================")
 
 
 # ---------------- STARTUP ----------------

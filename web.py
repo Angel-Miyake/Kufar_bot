@@ -7,6 +7,7 @@ from flask import (
 )
 
 import asyncio
+from bot import LOG_BUFFER
 from db import (
     init_db,
     add_filter_v2,
@@ -113,6 +114,12 @@ def status():
     state = asyncio.run(get_setting("parser_running", "1"))
     return jsonify({
         "running": state == "1"
+    })
+
+@app.route("/api/logs")
+def logs():
+    return jsonify({
+        "logs": LOG_BUFFER[-100:]
     })
 
 
