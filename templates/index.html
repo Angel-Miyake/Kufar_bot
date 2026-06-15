@@ -329,13 +329,37 @@ input[type=submit] {
 </div>
 
 <div class="market">
+
 <h3>💰 Рыночная Аналитика</h3>
 
-<p>Total: <span id="m_total">{{ market.total }}</span></p>
-<p>Avg: <span id="m_avg">{{ market.avg_price }}</span></p>
-<p>Median: <span id="m_med">{{ market.median_price }}</span></p>
-<p>Min: <span id="m_min">{{ market.min_price }}</span></p>
-<p>Max: <span id="m_max">{{ market.max_price }}</span></p>
+<div class="market-grid">
+
+    <div class="market-item">
+        Всего объявлений
+        <b id="m_total">{{ market.total }}</b>
+    </div>
+
+    <div class="market-item">
+        Средняя цена
+        <b id="m_avg">{{ market.avg_price }}</b>
+    </div>
+
+    <div class="market-item">
+        Медиана
+        <b id="m_med">{{ market.median_price }}</b>
+    </div>
+
+    <div class="market-item">
+        Минимум
+        <b id="m_min">{{ market.min_price }}</b>
+    </div>
+
+    <div class="market-item">
+        Максимум
+        <b id="m_max">{{ market.max_price }}</b>
+    </div>
+
+</div>
 
 </div>
 </div>
