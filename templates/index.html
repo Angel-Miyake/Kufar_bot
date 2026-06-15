@@ -61,6 +61,25 @@ h3{
     opacity:.7;
 }
 
+.status{
+    padding:10px 16px;
+    border-radius:14px;
+    font-size:14px;
+    font-weight:600;
+}
+
+.online{
+    background:rgba(52,199,89,.15);
+    color:#34C759;
+    border:1px solid rgba(52,199,89,.25);
+}
+
+.offline{
+    background:rgba(255,69,58,.15);
+    color:#FF453A;
+    border:1px solid rgba(255,69,58,.25);
+}
+
 /* ===== LAYOUT ===== */
 .wrapper {
     display:flex;
@@ -310,6 +329,10 @@ input[type=submit] {
         <p>Мониторинг фильтров и объявлений</p>
     </div>
 
+    <div class="status online">
+        🟢 Online
+    </div>
+    
 </div>
 
 <div class="stat-box">
