@@ -15,18 +15,30 @@
 
 /* ===== THEME ===== */
 body.dark {
-    --bg:#0b1220;
-    --card:rgba(255,255,255,0.06);
-    --text:#fff;
-    --input:rgba(255,255,255,0.08);
+    --bg:#000000;
+    --card:rgba(28,28,30,0.85);
+    --text:#ffffff;
+    --input:rgba(44,44,46,0.9);
+    --border:rgba(255,255,255,.08);
+    --accent:#0A84FF;
 }
 
 body {
     margin:0;
-    font-family:Arial;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
     background:var(--bg);
     color:var(--text);
-    touch-action: manipulation;
+    touch-action:manipulation;
+}
+
+h1{
+    font-size:34px;
+    font-weight:700;
+    margin-bottom:20px;
+}
+
+h3{
+    margin-top:0;
 }
 
 /* ===== LAYOUT ===== */
@@ -83,9 +95,13 @@ body {
 /* ===== CARDS ===== */
 .card {
     background:var(--card);
+    backdrop-filter:blur(20px);
+    border:1px solid var(--border);
     padding:20px;
-    border-radius:14px;
-    margin-bottom:15px;
+    border-radius:22px;
+    margin-bottom:16px;
+    box-shadow:
+        0 8px 30px rgba(0,0,0,.25);
 }
 
 /* ===== INPUT ===== */
@@ -100,9 +116,13 @@ input, select {
 }
 
 input[type=submit] {
-    background:#3b82f6;
+    background:#0A84FF;
     color:white;
     cursor:pointer;
+    border:none;
+    border-radius:14px;
+    padding:14px;
+    font-weight:600;
 }
 
 /* ===== STATS ===== */
@@ -111,34 +131,68 @@ input[type=submit] {
 .stat {
     flex:1;
     background:var(--card);
-    padding:15px;
-    border-radius:10px;
+    border:1px solid var(--border);
+    border-radius:24px;
+    padding:24px;
     text-align:center;
+    backdrop-filter:blur(20px);
+}
+
+.stat h2{
+    font-size:34px;
+    margin:0;
+    font-weight:700;
+}
+
+.stat p{
+    opacity:.7;
+    margin-top:8px;
 }
 
 /* ===== MARKET ===== */
 .market {
     margin-top:20px;
     background:var(--card);
-    padding:20px;
-    border-radius:14px;
+    border:1px solid var(--border);
+    border-radius:24px;
+    padding:24px;
+    backdrop-filter:blur(20px);
 }
 
 /* ===== BUTTONS ===== */
 .btn {
     display:inline-block;
     margin-top:8px;
-    padding:6px 10px;
-    border-radius:8px;
-    background:#ef4444;
+    padding:12px 18px;
+    border-radius:14px;
+    border:none;
+    background:#ff453a;
     color:white;
     text-decoration:none;
-    font-size:12px;
+    font-size:14px;
+    font-weight:600;
+    transition:.2s;
+    cursor:pointer;
+}
+.btn:hover{
+    transform:translateY(-1px);
 }
 
-.copy { background:#10b981; }
+.copy {
+    background:#0A84FF;
+}
 
-.url { word-break: break-all; }
+.url{
+    margin-top:10px;
+    padding:12px;
+    border-radius:12px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.05);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    color:#9ca3af;
+}
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
