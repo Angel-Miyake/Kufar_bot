@@ -118,10 +118,7 @@ def status():
 
 @app.route("/api/logs")
 def logs():
-    return jsonify({
-        "logs": LOG_BUFFER[-100:]
-    })
-
+    return jsonify({"logs": LOG_BUFFER[-200:]})
 
 # ---------------- START ----------------
 

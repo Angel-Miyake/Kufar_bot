@@ -405,8 +405,10 @@ input[type=submit] {
     </div>
 
 </div>
+
 <div class="card">
     <h3>📡 Лог парсера</h3>
+    
     <pre id="logBox" style="
         max-height:300px;
         overflow:auto;
@@ -414,6 +416,10 @@ input[type=submit] {
         font-size:12px;
         opacity:0.9;
     "></pre>
+</div>
+<div class="card">
+    <h3>📡 Live log</h3>
+    <pre id="logBox" style="height:300px; overflow:auto;"></pre>
 </div>
 </div>
 <div class="card">
@@ -424,7 +430,7 @@ input[type=submit] {
     <button class="btn copy" onclick="runParser()">▶ START</button>
     <button class="btn" onclick="stopParser()">⛔ STOP</button>
 </div>
-
+<div id="logBox"></div>
 </div>
 
 <!-- FILTERS -->
