@@ -41,6 +41,26 @@ h3{
     margin-top:0;
 }
 
+.hero{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:24px;
+    padding:24px;
+
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:24px;
+
+    backdrop-filter:blur(20px);
+}
+
+.hero p{
+    margin:8px 0 0 0;
+    opacity:.7;
+}
+
 /* ===== LAYOUT ===== */
 .wrapper {
     display:flex;
@@ -66,30 +86,49 @@ h3{
 }
 
 /* ===== MAIN ===== */
-.main {
+.main{
     flex:1;
     padding:30px;
+    padding-bottom:100px;
 }
 
 /* ===== MOBILE TABS ===== */
-.tabs {
+.tabs{
     display:none;
-    position:sticky;
-    top:0;
-    z-index:10;
-    background:rgba(0,0,0,0.4);
-    backdrop-filter: blur(10px);
-    padding:10px;
-    gap:6px;
+    position:fixed;
+    bottom:12px;
+    left:12px;
+    right:12px;
+
+    z-index:999;
+
+    background:rgba(20,20,20,.8);
+    backdrop-filter:blur(30px);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:22px;
+
+    padding:8px;
+    gap:8px;
+
+    box-shadow:
+        0 10px 40px rgba(0,0,0,.35);
 }
 
-.tabs button {
+.tabs button{
     flex:1;
-    padding:10px;
+
+    padding:12px 6px;
+
     border:none;
-    border-radius:10px;
-    background:var(--card);
-    color:var(--text);
+    border-radius:14px;
+
+    background:transparent;
+    color:#ffffff;
+
+    font-size:12px;
+    font-weight:600;
 }
 
 /* ===== CARDS ===== */
@@ -203,7 +242,10 @@ input[type=submit] {
 
     .tabs { display:flex; }
 
-    .main { padding:12px; }
+    .main{
+        padding:12px;
+        padding-bottom:110px;
+    }
 }
 
 </style>
@@ -233,9 +275,17 @@ input[type=submit] {
 <div class="main">
 
 <!-- DASHBOARD -->
+<!-- DASHBOARD -->
 <div id="dash">
 
-<h1>📊 Главная</h1>
+<div class="hero">
+
+    <div>
+        <h1>📊 Главная</h1>
+        <p>Мониторинг фильтров и объявлений</p>
+    </div>
+
+</div>
 
 <div class="stat-box">
 
