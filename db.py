@@ -1,8 +1,30 @@
+import os
 import statistics
+
+import asyncpg
 import aiosqlite
 
+DATABASE_URL = os.getenv("DATABASE_URL")
 DB_NAME = "filters.db"
 
+
+_pool = None
+
+
+async def get_db():
+    global _pool
+
+    if DATABASE_URL:
+
+        if _pool is None:
+            _pool = await asyncpg.create_pool(
+                DATABASE_URL,
+                ssl="require"
+            )
+
+        return _pool
+
+    return None
 
 # ---------------- INIT ----------------
 
@@ -152,6 +174,10 @@ async def add_filter_v2(
 
 
 async def get_all_filters():
+    
+    import os
+
+    print("DB PATH =", os.path.abspath(DB_NAME))
 
     async with aiosqlite.connect(DB_NAME) as db:
 
