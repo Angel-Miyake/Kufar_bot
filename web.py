@@ -118,8 +118,8 @@ def status():
 
 @app.route("/api/test")
 def test():
-    print("🔥 TEST API CALLED")
-    return "OK"
+
+    raise Exception("TEST ERROR")
 
 @app.route("/api/logs")
 def logs():
