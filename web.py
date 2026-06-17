@@ -116,6 +116,11 @@ def status():
         "running": state == "1"
     })
 
+@app.route("/api/test")
+def test():
+    print("🔥 TEST API CALLED")
+    return "OK"
+
 @app.route("/api/logs")
 def logs():
     return jsonify({"logs": LOG_BUFFER[-200:]})
