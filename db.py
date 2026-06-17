@@ -29,6 +29,59 @@ async def get_db():
 # ---------------- INIT ----------------
 
 async def init_db():
+
+    pool = await get_db()
+
+    # ---------- PostgreSQL ----------
+    if pool:
+
+        async with pool.acquire() as db:
+
+            await db.execute("""
+                CREATE TABLE IF NOT EXISTS filters (
+                    id SERIAL PRIMARY KEY,
+                    telegram_id BIGINT NOT NULL,
+                    source TEXT DEFAULT 'kufar',
+                    name TEXT,
+                    url TEXT NOT NULL,
+                    active INTEGER DEFAULT 1,
+                    initialized INTEGER DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+
+            await db.execute("""
+                CREATE TABLE IF NOT EXISTS sent_ads (
+                    id SERIAL PRIMARY KEY,
+                    filter_id INTEGER NOT NULL,
+                    ad_id TEXT NOT NULL,
+                    UNIQUE(filter_id, ad_id)
+                )
+            """)
+
+            await db.execute("""
+                CREATE TABLE IF NOT EXISTS market_ads (
+                    id SERIAL PRIMARY KEY,
+                    filter_id INTEGER NOT NULL,
+                    ad_id TEXT NOT NULL,
+                    title TEXT,
+                    price DOUBLE PRECISION,
+                    link TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE(filter_id, ad_id)
+                )
+            """)
+
+            await db.execute("""
+                CREATE TABLE IF NOT EXISTS settings (
+                    key TEXT PRIMARY KEY,
+                    value TEXT
+                )
+            """)
+
+        return
+
+    # ---------- SQLite ----------
     async with aiosqlite.connect(DB_NAME) as db:
 
         await db.execute("""
@@ -73,6 +126,7 @@ async def init_db():
         )
         """)
 
+        await db.commit()
         # ---------------- MIGRATIONS ----------------
 
         try:
@@ -147,10 +201,30 @@ async def add_filter_v2(
         name: str,
         url: str
 ):
-    """
-    Новый метод.
-    Для Mini App.
-    """
+
+    pool = await get_db()
+
+    if pool:
+
+        async with pool.acquire() as db:
+
+            await db.execute("""
+                INSERT INTO filters
+                (
+                    telegram_id,
+                    source,
+                    name,
+                    url
+                )
+                VALUES ($1, $2, $3, $4)
+            """,
+                telegram_id,
+                source,
+                name,
+                url
+            )
+
+        return
 
     async with aiosqlite.connect(DB_NAME) as db:
 
@@ -174,8 +248,34 @@ async def add_filter_v2(
 
 
 async def get_all_filters():
-    
-    import os
+
+    pool = await get_db()
+
+    if pool:
+
+        async with pool.acquire() as db:
+
+            rows = await db.fetch("""
+                SELECT
+                    id,
+                    telegram_id,
+                    source,
+                    url,
+                    initialized
+                FROM filters
+                WHERE active = 1
+            """)
+
+            return [
+                (
+                    r["id"],
+                    r["telegram_id"],
+                    r["source"],
+                    r["url"],
+                    r["initialized"]
+                )
+                for r in rows
+            ]
 
     print("DB PATH =", os.path.abspath(DB_NAME))
 

@@ -1,6 +1,8 @@
 import asyncio
 LOG_BUFFER = []
+from dotenv import load_dotenv
 
+load_dotenv()
 def log(msg: str):
     print(msg)
     LOG_BUFFER.append(msg)
@@ -37,7 +39,8 @@ from parser import fetch_ads_playwright
 
 
 check_lock = asyncio.Lock()
-
+import os
+print("DATABASE_URL =", os.getenv("DATABASE_URL"))
 
 # ---------------- COMMANDS ----------------
 

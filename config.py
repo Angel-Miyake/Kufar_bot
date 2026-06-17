@@ -1,4 +1,6 @@
 import os
 
-TOKEN = os.getenv("BOT_TOKEN")
+TOKEN = "8082997794:AAGgoHg-QULRpSjdcqd_0SjU5VUSdLgmXmE"
 CHECK_INTERVAL = 20
+#8082997794:AAGgoHg-QULRpSjdcqd_0SjU5VUSdLgmXmE
+#os.getenv("BOT_TOKEN")
