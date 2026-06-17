@@ -7,6 +7,10 @@ from flask import (
 )
 
 import asyncio
+
+import os
+print("WEB DATABASE_URL =", os.getenv("DATABASE_URL"))
+
 from bot import LOG_BUFFER
 from db import (
     init_db,
