@@ -3,3 +3,4 @@ aiosqlite==0.20.0
 python-telegram-bot[job-queue]
 playwright
 asyncpg
+python-dotenv
