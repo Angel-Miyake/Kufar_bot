@@ -203,11 +203,12 @@ async def add_filter_v2(
 ):
 
     pool = await get_db()
-
+    print("POSTGRES =", pool is not None)
     if pool:
-
+        print("INSERT INTO POSTGRES")
+        print("INSERT OK")
         async with pool.acquire() as db:
-
+            
             await db.execute("""
                 INSERT INTO filters
                 (
@@ -251,6 +252,7 @@ async def get_all_filters():
 
     pool = await get_db()
 
+    # ---------- PostgreSQL ----------
     if pool:
 
         async with pool.acquire() as db:
@@ -268,14 +270,17 @@ async def get_all_filters():
 
             return [
                 (
-                    r["id"],
-                    r["telegram_id"],
-                    r["source"],
-                    r["url"],
-                    r["initialized"]
+                    row["id"],
+                    row["telegram_id"],
+                    row["source"],
+                    row["url"],
+                    row["initialized"],
                 )
-                for r in rows
+                for row in rows
             ]
+
+    # ---------- SQLite ----------
+    import os
 
     print("DB PATH =", os.path.abspath(DB_NAME))
 
