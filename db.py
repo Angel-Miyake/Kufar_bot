@@ -26,13 +26,11 @@ async def get_db():
 
     return None
 
-# ---------------- INIT ----------------
 
 async def init_db():
 
     pool = await get_db()
 
-    # ---------- PostgreSQL ----------
     if pool:
 
         async with pool.acquire() as db:
@@ -81,7 +79,6 @@ async def init_db():
 
         return
 
-    # ---------- SQLite ----------
     async with aiosqlite.connect(DB_NAME) as db:
 
         await db.execute("""
@@ -127,7 +124,6 @@ async def init_db():
         """)
 
         await db.commit()
-        # ---------------- MIGRATIONS ----------------
 
         try:
             await db.execute(
@@ -167,16 +163,10 @@ async def init_db():
         await db.commit()
 
 
-# ---------------- FILTERS ----------------
-
 async def add_filter(
         telegram_id: int,
         url: str
 ):
-    """
-    Старый метод.
-    Ничего не ломаем.
-    """
 
     async with aiosqlite.connect(DB_NAME) as db:
 
@@ -208,7 +198,7 @@ async def add_filter_v2(
         print("INSERT INTO POSTGRES")
         print("INSERT OK")
         async with pool.acquire() as db:
-            
+
             await db.execute("""
                 INSERT INTO filters
                 (
@@ -252,7 +242,6 @@ async def get_all_filters():
 
     pool = await get_db()
 
-    # ---------- PostgreSQL ----------
     if pool:
 
         async with pool.acquire() as db:
@@ -279,7 +268,6 @@ async def get_all_filters():
                 for row in rows
             ]
 
-    # ---------- SQLite ----------
     import os
 
     print("DB PATH =", os.path.abspath(DB_NAME))
@@ -374,8 +362,6 @@ async def mark_initialized(filter_id: int):
         await db.commit()
 
 
-# ---------------- BOT DEDUP ----------------
-
 async def ad_already_sent(
         filter_id: int,
         ad_id: str
@@ -427,8 +413,6 @@ async def save_sent_ad(
 
         await db.commit()
 
-
-# ---------------- MARKET ----------------
 
 async def save_market_ad(
         filter_id,
@@ -506,8 +490,6 @@ async def get_market_stats():
         }
 
 
-# ---------------- STATS ----------------
-
 async def get_stats():
 
     async with aiosqlite.connect(DB_NAME) as db:
@@ -547,6 +529,8 @@ async def get_stats():
             "total_sent": total_sent,
             "total_ads": total_ads
         }
+
+
 async def get_filters_for_panel():
 
     async with aiosqlite.connect(DB_NAME) as db:
@@ -566,6 +550,7 @@ async def get_filters_for_panel():
         rows = await cur.fetchall()
 
     return rows
+
 
 async def set_setting(key: str, value: str):
     async with aiosqlite.connect(DB_NAME) as db:

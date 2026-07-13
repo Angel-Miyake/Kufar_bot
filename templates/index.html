@@ -3,7 +3,6 @@
 <head>
 <title>Kufar HUD</title>
 
-<!-- 📱 MOBILE FIX + ZOOM BLOCK -->
 <meta name="viewport"
       content="width=device-width,
                initial-scale=1,
@@ -13,7 +12,6 @@
 
 <style>
 
-/* ===== THEME ===== */
 body.dark {
     --bg:#000000;
     --card:rgba(28,28,30,0.85);
@@ -96,13 +94,11 @@ h3{
     background:#34C759;
 }
 
-/* ===== LAYOUT ===== */
 .wrapper {
     display:flex;
     min-height:100vh;
 }
 
-/* ===== SIDEBAR ===== */
 .sidebar {
     width:240px;
     padding:20px;
@@ -120,14 +116,12 @@ h3{
     cursor:pointer;
 }
 
-/* ===== MAIN ===== */
 .main{
     flex:1;
     padding:30px;
     padding-bottom:100px;
 }
 
-/* ===== MOBILE TABS ===== */
 .tabs{
     display:none;
     position:fixed;
@@ -171,7 +165,6 @@ h3{
     border:1px solid rgba(255,255,255,.08);
 }
 
-/* ===== CARDS ===== */
 .card {
     background:var(--card);
     backdrop-filter:blur(20px);
@@ -183,7 +176,6 @@ h3{
         0 8px 30px rgba(0,0,0,.25);
 }
 
-/* ===== INPUT ===== */
 input, select {
     width:100%;
     padding:10px;
@@ -204,7 +196,6 @@ input[type=submit] {
     font-weight:600;
 }
 
-/* ===== STATS ===== */
 .stat-box { display:flex; gap:10px; }
 
 .stat {
@@ -233,7 +224,6 @@ input[type=submit] {
     margin-bottom:12px;
 }
 
-/* ===== MARKET ===== */
 .market {
     margin-top:20px;
     background:var(--card);
@@ -263,7 +253,6 @@ input[type=submit] {
     margin-top:4px;
 }
 
-/* ===== BUTTONS ===== */
 .btn {
     display:inline-block;
     margin-top:8px;
@@ -298,7 +287,6 @@ input[type=submit] {
     color:#9ca3af;
 }
 
-/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
 
     .wrapper { flex-direction:column; }
@@ -318,7 +306,6 @@ input[type=submit] {
 
 <body class="dark">
 
-<!-- 📱 MOBILE TABS -->
 <div class="tabs">
     <button onclick="show('dash', this)">Главная</button>
     <button onclick="show('filters', this)">Фильтры</button>
@@ -328,7 +315,6 @@ input[type=submit] {
 
 <div class="wrapper">
 
-<!-- SIDEBAR -->
 <div class="sidebar">
 <h3>📦 MENU</h3>
 <button onclick="show('dash', this)">Главная</button>
@@ -338,8 +324,6 @@ input[type=submit] {
 </div>
 
 <div class="main">
-
-<!-- DASHBOARD -->
 
 <div id="dash">
 
@@ -354,7 +338,7 @@ input[type=submit] {
         <span class="dot"></span>
         Online
     </div>
-    
+
 </div>
 
 <div class="stat-box">
@@ -405,23 +389,8 @@ input[type=submit] {
     </div>
 
 </div>
+</div>
 
-<div class="card">
-    <h3>📡 Лог парсера</h3>
-    
-    <pre id="logBox" style="
-        max-height:300px;
-        overflow:auto;
-        white-space:pre-wrap;
-        font-size:12px;
-        opacity:0.9;
-    "></pre>
-</div>
-<div class="card">
-    <h3>📡 Live log</h3>
-    <pre id="logBox" style="height:300px; overflow:auto;"></pre>
-</div>
-</div>
 <div class="card">
     <h3>Парсер</h3>
 
@@ -430,10 +399,19 @@ input[type=submit] {
     <button class="btn copy" onclick="runParser()">▶ START</button>
     <button class="btn" onclick="stopParser()">⛔ STOP</button>
 </div>
-<div id="logBox"></div>
+
+<div class="card">
+    <h3>📡 Лог парсера</h3>
+    <pre id="logBox" style="
+        max-height:300px;
+        overflow:auto;
+        white-space:pre-wrap;
+        font-size:12px;
+        opacity:0.9;
+    "></pre>
+</div>
 </div>
 
-<!-- FILTERS -->
 <div id="filters" style="display:none">
 
 <h1>📋 Фильтры</h1>
@@ -472,14 +450,12 @@ input[type=submit] {
 
 </div>
 
-<!-- ADD FILTER -->
 <div id="add" style="display:none">
 
 <h1>➕ Добавить фильтры</h1>
 
 <form method="post" action="/">
 
-<!-- 🔥 SOURCE SELECT -->
 Source
 <input type="hidden" name="telegram_id" value="1">
 <input type="hidden" name="name" value="Фильтр">
@@ -498,7 +474,6 @@ URL
 
 </div>
 
-<!-- ANALYTICS -->
 <div id="analytics" style="display:none">
 
 <h1>📈 Analytics</h1>
@@ -519,7 +494,6 @@ URL
 
 <script>
 
-// ===== NAV =====
 function show(id, btn){
 
     document
@@ -539,7 +513,6 @@ function show(id, btn){
     }
 }
 
-// ===== COPY =====
 function copyText(btn){
 
     let url =
@@ -556,7 +529,6 @@ function copyText(btn){
     }, 1500);
 }
 
-// ===== REALTIME =====
 async function update(){
 
     try {

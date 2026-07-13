@@ -11,7 +11,8 @@ import asyncio
 import os
 print("WEB DATABASE_URL =", os.getenv("DATABASE_URL"))
 
-from bot import LOG_BUFFER
+from logger import LOG_BUFFER
+from scheduler import start_scheduler, stop_scheduler
 from db import (
     init_db,
     add_filter_v2,
@@ -25,8 +26,6 @@ from db import (
 
 app = Flask(__name__)
 
-
-# ---------------- HOME ----------------
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -74,8 +73,6 @@ def index():
     )
 
 
-# ---------------- DELETE ----------------
-
 @app.route("/delete/<int:fid>")
 def delete(fid):
 
@@ -85,8 +82,6 @@ def delete(fid):
 
     return redirect("/")
 
-
-# ---------------- API ----------------
 
 @app.route("/api/stats")
 def api_stats():
@@ -106,11 +101,13 @@ def api_market():
 @app.route("/api/run", methods=["POST"])
 def run():
     asyncio.run(set_setting("parser_running", "1"))
+    start_scheduler()
     return jsonify({"status": "running"})
 
 @app.route("/api/stop", methods=["POST"])
 def stop():
     asyncio.run(set_setting("parser_running", "0"))
+    stop_scheduler()
     return jsonify({"status": "stopped"})
 
 @app.route("/api/status")
@@ -129,11 +126,11 @@ def test():
 def logs():
     return jsonify({"logs": LOG_BUFFER[-200:]})
 
-# ---------------- START ----------------
 
 if __name__ == "__main__":
     asyncio.run(init_db())
     asyncio.run(set_setting("parser_running", "1"))
+    start_scheduler()
     import os
 
     port = int(os.environ.get("PORT", 5000))

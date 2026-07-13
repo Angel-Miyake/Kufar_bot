@@ -1,16 +1,9 @@
 import asyncio
-LOG_BUFFER = []
 from dotenv import load_dotenv
 
 load_dotenv()
-def log(msg: str):
-    print(msg)
-    LOG_BUFFER.append(msg)
 
-    # защита от бесконечного роста памяти
-    if len(LOG_BUFFER) > 500:
-        LOG_BUFFER.pop(0)
-        
+from logger import LOG_BUFFER, log
 from parser_avby import fetch_ads_avby
 from telegram import Update
 from telegram.ext import (
@@ -37,12 +30,12 @@ from db import (
 
 from parser import fetch_ads_playwright
 
+from scheduler import run_check_cycle
 
-check_lock = asyncio.Lock()
+
 import os
 print("DATABASE_URL =", os.getenv("DATABASE_URL"))
 
-# ---------------- COMMANDS ----------------
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
@@ -65,8 +58,6 @@ async def add(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     url = context.args[0].strip()
-
-    # определяем источник
 
     if "kufar.by" in url:
 
@@ -168,128 +159,20 @@ async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-# ---------------- CHECK ADS ----------------
-
 async def check_ads(context: ContextTypes.DEFAULT_TYPE):
 
-    print("🔥 CHECK_ADS CALLED")
-    log("🔥 ENTER check_ads")
+    print("CHECK_ADS CALLED")
 
-    running = await get_setting("parser_running", "1")
+    async def _send(chat_id, text):
+        await context.bot.send_message(chat_id=chat_id, text=text)
 
-    if running != "1":
-        log("⛔ PARSER STOPPED FROM MINI APP")
-        return
+    await run_check_cycle(send_func=_send)
 
-    if check_lock.locked():
-        log("⛔ SKIP (already running)")
-        return
-
-    async with check_lock:
-
-        log("🚀 START CHECK CYCLE")
-
-        filters = await get_all_filters()
-
-        log(f"📦 TOTAL FILTERS: {len(filters)}")
-
-        total_sent = 0
-
-        for (
-            filter_id,
-            telegram_id,
-            source,
-            url,
-            initialized
-        ) in filters:
-
-            log("------------------------------")
-            log(f"📍 FILTER #{filter_id}")
-            log(f"📡 SOURCE: {source}")
-            log(f"🔗 URL: {url}")
-
-            try:
-
-                if source == "kufar":
-                    ads = await fetch_ads_playwright(url)
-
-                elif source == "avby":
-                    ads = await fetch_ads_avby(url)
-
-                else:
-                    ads = []
-
-                log(f"📄 FOUND ADS: {len(ads)}")
-
-                if not initialized:
-
-                    log(f"🆕 FIRST START FILTER #{filter_id}")
-
-                    for ad in ads:
-                        item_id = ad.get("id")
-
-                        if item_id:
-                            await save_sent_ad(filter_id, str(item_id))
-
-                    await mark_initialized(filter_id)
-                    continue
-
-                sent_count = 0
-                MAX_SEND_PER_CYCLE = 10
-
-                for ad in ads:
-
-                    if sent_count >= MAX_SEND_PER_CYCLE:
-                        log("🛑 LIMIT REACHED")
-                        break
-
-                    item_id = ad.get("id")
-
-                    if not item_id:
-                        continue
-
-                    item_id = str(item_id).strip()
-
-                    if await ad_already_sent(filter_id, item_id):
-                        continue
-
-                    await context.bot.send_message(
-                        chat_id=telegram_id,
-                        text=f"{ad['text']}\n\n{ad['link']}"
-                    )
-
-                    await save_sent_ad(filter_id, item_id)
-
-                    await save_market_ad(
-                        filter_id,
-                        item_id,
-                        ad["text"],
-                        ad.get("price"),
-                        ad["link"]
-                    )
-
-                    sent_count += 1
-                    total_sent += 1
-
-                log(f"📤 SENT FOR FILTER: {sent_count}")
-
-            except Exception as e:
-                log(f"❌ ERROR FILTER {filter_id}: {e}")
-
-        log("==============================")
-        log(f"🏁 CYCLE DONE | TOTAL SENT: {total_sent}")
-        log("==============================")
-
-
-
-# ---------------- STARTUP ----------------
 
 async def on_startup(app):
 
     await init_db()
 
-
-# ---------------- MAIN ----------------
 
 def main():
 
@@ -327,7 +210,7 @@ def main():
         first=5
     )
 
-    print("🤖 BOT STARTED")
+    print("BOT STARTED")
     print("JOB QUEUE =", app.job_queue)
     app.run_polling()
 

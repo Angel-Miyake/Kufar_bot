@@ -9,8 +9,6 @@ BASE_DOMAIN = "https://www.kufar.by"
 ANCHOR_FILE = "anchors.json"
 
 
-# ---------------- ANCHOR ----------------
-
 def _url_key(url: str):
     return hashlib.md5(url.encode()).hexdigest()
 
@@ -37,12 +35,10 @@ def set_anchor(url, anchor):
     save_anchors(data)
 
 
-# ---------------- UTILS ----------------
-
 def extract_id(link: str):
     if not link:
         return None
-    m = re.search(r"/item/(\d+)", link)
+    m = re.search(r"/(?:item|vi)/(\d+)", link)
     return m.group(1) if m else None
 
 
@@ -59,39 +55,32 @@ def parse_price(text: str):
     if any(x in text for x in ["договор", "free", "бесплат", "обмен"]):
         return None
 
-    nums = re.findall(r"\d+", text)
+    compact = re.sub(r"(?<=[\d])[ \u00a0](?=[\d])", "", text)
 
-    if not nums:
+    nums = re.findall(r"\d[\d ]*\d|\d", compact)
+    values = []
+    for n in nums:
+        n = n.replace(" ", "").replace("\u00a0", "")
+        try:
+            v = float(n)
+            if 10 <= v <= 10000000:
+                values.append(v)
+        except:
+            pass
+
+    if not values:
         return None
 
-    try:
-        price = float(nums[0])
-
-        if price < 10 or price > 10000000:
-            return None
-
-        return price
-    except:
-        return None
+    return max(values)
 
 
 async def get_price(el):
     try:
-        nodes = await el.query_selector_all("span, div")
-
-        for n in nodes[:5]:
-            txt = await n.inner_text()
-            price = parse_price(txt)
-            if price:
-                return price
+        txt = await el.inner_text()
+        return parse_price(txt)
     except:
-        pass
+        return None
 
-    return None
-
-# ... ВСЁ ТВОЁ ОСТАВЛЯЕМ ...
-
-# ---------------- MAIN ----------------
 
 async def fetch_ads_playwright(url: str):
 
@@ -115,7 +104,9 @@ async def fetch_ads_playwright(url: str):
                 await page.mouse.wheel(0, 3000)
                 await page.wait_for_timeout(500)
 
-            elements = await page.query_selector_all("a[href*='/item/']")
+            elements = await page.query_selector_all(
+                "a[href*='/item/'], a[href*='/vi/']"
+            )
 
             seen = set()
             clean = []
@@ -130,20 +121,14 @@ async def fetch_ads_playwright(url: str):
                 seen.add(item_id)
                 clean.append((el, item_id))
 
-            # 🔥 берём только верх страницы
             clean = clean[:20]
 
             if not clean:
                 return []
 
-            if last_anchor is None:
-                set_anchor(url, clean[0][1])
-                return []
-
             for i, (el, item_id) in enumerate(clean):
 
-                # 🔥 anchor + fallback
-                if item_id == last_anchor:
+                if last_anchor is not None and item_id == last_anchor:
                     break
 
                 if i == 0:
