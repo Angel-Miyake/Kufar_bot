@@ -46,8 +46,6 @@ async def fetch_ads_avby(url):
 
         try:
 
-            print(f"[AVBY] {url}")
-
             await page.goto(
                 url,
                 timeout=60000
@@ -104,10 +102,6 @@ async def fetch_ads_avby(url):
                 })
 
             ads = ads[:20]
-
-            print(
-                f"[AVBY] collected: {len(ads)}"
-            )
 
             return ads
 

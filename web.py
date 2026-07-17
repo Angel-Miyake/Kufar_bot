@@ -13,6 +13,7 @@ print("WEB DATABASE_URL =", os.getenv("DATABASE_URL"))
 
 from logger import LOG_BUFFER
 from scheduler import start_scheduler, stop_scheduler
+from parser import ensure_browser
 from db import (
     init_db,
     add_filter_v2,
@@ -128,6 +129,7 @@ def logs():
 
 
 if __name__ == "__main__":
+    ensure_browser()
     asyncio.run(init_db())
     asyncio.run(set_setting("parser_running", "1"))
     start_scheduler()

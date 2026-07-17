@@ -28,7 +28,7 @@ from db import (
     mark_initialized
 )
 
-from parser import fetch_ads_playwright
+from parser import fetch_ads_playwright, ensure_browser
 
 from scheduler import run_check_cycle
 
@@ -171,6 +171,7 @@ async def check_ads(context: ContextTypes.DEFAULT_TYPE):
 
 async def on_startup(app):
 
+    ensure_browser()
     await init_db()
 
 

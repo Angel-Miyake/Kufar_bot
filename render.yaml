@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: kufar-web
+    runtime: python
+    buildCommand: pip install -r requirements.txt && playwright install chromium && playwright install chromium-headless-shell
+    startCommand: python web.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"
+
+  - type: worker
+    name: kufar-bot
+    runtime: python
+    buildCommand: pip install -r requirements.txt && playwright install chromium && playwright install chromium-headless-shell
+    startCommand: python bot.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"

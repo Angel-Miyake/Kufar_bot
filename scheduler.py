@@ -39,10 +39,10 @@ async def run_check_cycle(send_func=None):
 
     async with check_lock:
 
-        log("START CHECK CYCLE")
-
         filters = await get_all_filters()
-        log(f"TOTAL FILTERS: {len(filters)}")
+
+        if not filters:
+            return
 
         total_sent = 0
 
@@ -53,11 +53,6 @@ async def run_check_cycle(send_func=None):
             url,
             initialized,
         ) in filters:
-
-            log("------------------------------")
-            log(f"FILTER #{filter_id}")
-            log(f"SOURCE: {source}")
-            log(f"URL: {url}")
 
             try:
 
@@ -71,7 +66,6 @@ async def run_check_cycle(send_func=None):
                 log(f"FOUND ADS: {len(ads)}")
 
                 if not initialized:
-                    log(f"FIRST START FILTER #{filter_id}")
                     for ad in ads:
                         item_id = ad.get("id")
                         if item_id:
@@ -85,7 +79,6 @@ async def run_check_cycle(send_func=None):
                 for ad in ads:
 
                     if sent_count >= MAX_SEND_PER_CYCLE:
-                        log("LIMIT REACHED")
                         break
 
                     item_id = ad.get("id")
@@ -118,14 +111,11 @@ async def run_check_cycle(send_func=None):
                     sent_count += 1
                     total_sent += 1
 
-                log(f"SENT FOR FILTER: {sent_count}")
-
             except Exception as e:
                 log(f"ERROR FILTER {filter_id}: {e}")
 
-        log("==============================")
-        log(f"CYCLE DONE | TOTAL SENT: {total_sent}")
-        log("==============================")
+        if total_sent > 0:
+            log(f"SENT: {total_sent}")
 
 
 async def _scheduler_task():

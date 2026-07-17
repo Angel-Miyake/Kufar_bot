@@ -1,6 +1,9 @@
 import re
 import json
 import os
+import sys
+import shutil
+import subprocess
 import hashlib
 from playwright.async_api import async_playwright
 
@@ -95,8 +98,6 @@ async def fetch_ads_playwright(url: str):
         page = await browser.new_page()
 
         try:
-            print(f"[PARSER] {url}")
-
             await page.goto(url, timeout=30000)
             await page.wait_for_timeout(2000)
 
@@ -153,6 +154,25 @@ async def fetch_ads_playwright(url: str):
     if new_anchor:
         set_anchor(url, new_anchor)
 
-    print(f"[PARSER] collected: {len(ads)}")
-
     return ads
+
+
+def ensure_browser():
+    possible_dirs = [
+        os.path.join(os.path.expanduser("~"), ".cache", "ms-playwright"),
+        os.path.join(os.path.expandvars("%LOCALAPPDATA%"), "ms-playwright"),
+    ]
+    chromium_present = False
+    for cache_dir in possible_dirs:
+        if os.path.isdir(cache_dir):
+            for name in os.listdir(cache_dir):
+                if name.startswith("chromium"):
+                    chromium_present = True
+                    break
+        if chromium_present:
+            break
+    if not chromium_present:
+        if shutil.which("playwright"):
+            subprocess.run(["playwright", "install", "chromium"], check=False)
+        else:
+            subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=False)
