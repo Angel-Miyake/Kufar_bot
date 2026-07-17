@@ -456,8 +456,7 @@ input[type=submit] {
 
 <form method="post" action="/">
 
-Source
-<input type="hidden" name="telegram_id" value="1">
+<input type="hidden" name="telegram_id" id="telegram_id" value="1">
 <input type="hidden" name="name" value="Фильтр">
 
 <select name="source" required>
@@ -591,6 +590,23 @@ async function loadLogs(){
 
 loadLogs();
 setInterval(loadLogs, 2000);
+</script>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+  (function () {
+    try {
+      var tg = window.Telegram.WebApp;
+      tg.ready();
+      var user = tg.initDataUnsafe && tg.initDataUnsafe.user;
+      if (user && user.id) {
+        var el = document.getElementById('telegram_id');
+        if (el) el.value = user.id;
+      }
+    } catch (e) {
+      console.log('Telegram WebApp not available:', e);
+    }
+  })();
 </script>
 
 </body>

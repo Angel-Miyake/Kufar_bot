@@ -20,8 +20,8 @@ from db import (
     get_stats,
     delete_filter,
     set_setting,
-     get_setting,
-    get_market_stats
+    get_setting,
+    get_market_stats,
 )
 
 app = Flask(__name__)
